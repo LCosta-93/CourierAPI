@@ -1,0 +1,63 @@
+openapi: 3.0.3
+info:
+  title: CourierAPI
+  version: "1.0.0"
+  description: >
+    Microserviço para envio de e-mails transacionais via Gmail API.
+    Requer autenticação via API Key.
+
+servers:
+  - url: https://courierapi.onrender.com
+
+paths:
+  /send-email:
+    post:
+      summary: Envia um e-mail via Gmail
+      tags: [E-mail]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [recipient, subject, body]
+              properties:
+                recipient:
+                  type: string
+                  format: email
+                  example: user@example.com
+                subject:
+                  type: string
+                  example: Hello
+                body:
+                  type: string
+                  example: Message body here
+      responses:
+        '200':
+          description: E-mail enviado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message_id:
+                    type: string
+                    example: 18cf1d0c8c6f3b23
+        '400':
+          description: Erro de validação
+        '401':
+          description: Não autorizado
+        '500':
+          description: Erro interno
+      security:
+        - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization

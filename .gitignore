@@ -1,0 +1,23 @@
+# Ambiente virtual
+venv/
+
+# Arquivos de cache do Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Arquivos sensíveis e temporários
+.env
+token.json
+credentials.json
+*.log
+*.bak
+*.tmp
+dev_send.py
+
+# Configurações de IDEs
+.vscode/
+.idea/
+
+# Local-only dev file
+main.py
