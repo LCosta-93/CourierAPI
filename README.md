@@ -12,10 +12,11 @@ Flask microservice to send transactional emails via Gmail API using OAuth 2.0 **
 * **/healthz** – Healthcheck
 * **/docs** – Swagger UI documentation
 * **/openapi.yaml** – OpenAPI schema export
+* **/status** – Build and environment diagnostic endpoint
 
 ---
 
-## 🗂️ Project Structure
+## 📂 Project Structure
 
 ```
 CourierAPI/
@@ -23,16 +24,31 @@ CourierAPI/
 │   ├── __init__.py
 │   ├── config.py
 │   ├── routes/
+│   │   ├── __init__.py
 │   │   ├── email.py
 │   │   ├── docs.py
+│   │   ├── status.py
 │   │   └── openapi.yaml
-│   └── services/
-│       ├── gmail.py
-│       └── log.py
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── gmail.py
+│   │   └── log.py
+│   ├── utils/
+│   │   ├── __init__.py
+│   │   ├── keygen.py
+│   │   └── gen_token.py
+│   └── templates/
+│       └── swagger_ui.html
+├── tests/
+│   ├── __init__.py
+│   ├── test_email.py
+│   └── test_gmail.py
+├── main.py
 ├── wsgi.py
 ├── requirements.txt
 ├── .env.example
-├── render.yaml
+├── .render.yaml
+├── .gitignore
 ```
 
 ---
@@ -51,10 +67,10 @@ cp .env.example .env           # then edit with your API_KEY
 ### 2. Add credentials
 
 * Place your **Desktop OAuth credentials** in `credentials.json`
-* Run once locally to trigger OAuth and create `token.json`
+* Run the token generation script to initiate OAuth and create `token.json`
 
 ```bash
-python main.py
+python -m app.utils.gen_token
 ```
 
 ---
@@ -88,7 +104,7 @@ LOG_PATH=email_log.txt
 
 ---
 
-## 📡 API Reference
+## 📱 API Reference
 
 ### POST `/send-email`
 
@@ -118,42 +134,63 @@ Content-Type: application/json
 }
 ```
 
+### GET `/status`
+
+Returns current environment configuration.
+
+**Response:**
+
+```json
+{
+  "status": "ok",
+  "version": "1.0.0",
+  "env": "development",
+  "port": 5000,
+  "log_path": "email_log.txt",
+  "credentials_path": "credentials.json",
+  "token_path": "token.json"
+}
+```
+
 ---
 
-## 🧾 Swagger UI
+## 💾 Swagger UI
 
-* Visit `/docs` to open Swagger UI
-* `/openapi.yaml` serves the schema
+* Visit [`/docs`](http://localhost:5000/docs) to open Swagger UI
+* `/openapi.yaml` serves the schema definition
+* Template located at `app/templates/swagger_ui.html`
 
 ---
 
 ## 🚀 Deployment Guidelines
 
-1. Run `main.py` locally once to generate `token.json`
+1. Run `app/utils/gen_token.py` locally once to generate `token.json`
 2. Upload `token.json` and `credentials.json` to the server
-3. Define the following env vars in Render:
+3. Define the following environment variables on Render:
 
-```
-API_KEY, TOKEN_PATH, CREDENTIALS_PATH, LOG_PATH
-```
+   ```
+   API_KEY, TOKEN_PATH, CREDENTIALS_PATH, LOG_PATH, PORT, ENV
+   ```
+4. Ensure these files are in `.gitignore`:
 
-4. Add this to `.gitignore`:
-
-```
-.env
-token.json
-credentials.json
-email_log.txt
-main.py
-```
+   ```
+   .env
+   credentials.json
+   token.json
+   email_log.txt
+   ```
 
 ---
 
-## 🛡️ Security Notes
+## 🧱 Deployment-Grade Features
 
-* Token-based access only; no session or cookies
-* `.env` and tokens never committed
-* OAuth Desktop flow avoids public redirect\_uri exposure
+✅ High Priority
+- Add Docker support with Dockerfile
+- Enable CORS for frontend integration
+
+🧩 Technical Priority
+- Expose BUILD_HASH for tracking CI deployments
+- Automate OpenAPI regeneration
 
 ---
 
@@ -175,18 +212,10 @@ Content-Type: application/json
 
 ---
 
-## 🧹 Removed Components
-
-* ❌ Session-based Flask logic (`secret_key`)
-* ❌ OAuth Web flow (`auth/`, `oauthweb.py`)
-* ❌ Redirect URIs
-
----
-
 ## 📝 License
 
 MIT
 
-**Author**: LCosta-93 — [github.com/LCosta-93](https://github.com/LCosta-93)
-
 ---
+
+**Author**: LCosta-93 — [github.com/LCosta-93](https://github.com/LCosta-93)

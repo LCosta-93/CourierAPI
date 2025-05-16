@@ -18,6 +18,3 @@ dev_send.py
 # Configurações de IDEs
 .vscode/
 .idea/
-
-# Local-only dev file
-main.py

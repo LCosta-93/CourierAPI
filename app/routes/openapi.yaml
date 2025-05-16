@@ -55,6 +55,40 @@ paths:
       security:
         - ApiKeyAuth: []
 
+  /status:
+    get:
+      summary: Retorna informações de ambiente e build
+      tags: [Diagnóstico]
+      responses:
+        '200':
+          description: Diagnóstico do sistema
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  version:
+                    type: string
+                    example: "1.0.0"
+                  env:
+                    type: string
+                    example: development
+                  port:
+                    type: integer
+                    example: 5000
+                  log_path:
+                    type: string
+                    example: email_log.txt
+                  credentials_path:
+                    type: string
+                    example: credentials.json
+                  token_path:
+                    type: string
+                    example: token.json
+
 components:
   securitySchemes:
     ApiKeyAuth:
